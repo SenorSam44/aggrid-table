@@ -73,7 +73,7 @@ const AgGridTable = (props) => {
                 let rowDataCell = {slice: `${axis} ${sliceNumber}`}
                 let total_labeled = 0.00
                 for (const value in props.gridData[axis][sliceNumber]) {
-                    if(props.labelMap[value] && props.labelMap[value]['name']) {
+                    if (props.labelMap[value] && props.labelMap[value]['name']) {
                         rowDataCell[props.labelMap[value]['name']] = props.gridData[axis][sliceNumber][value]
                         total_labeled += props.gridData[axis][sliceNumber][value]
                     }
@@ -84,20 +84,28 @@ const AgGridTable = (props) => {
         }
         setRowData(rowDataList)
         // setting column data
-        let columnPropertyList = [{field: 'slice'}, {field: 'total labeled', cellStyle: totalChangeCellStyle},]
+        let columnPropertyList = [{field: 'slice'}, {
+            field: 'total labeled',
+            cellStyle: totalChangeCellStyle,
+            valueFormatter: percentageFormatter
+        }]
         for (const label in props.labelMap) {
-            columnPropertyList.push({field: props.labelMap[label]['name'], cellStyle: changeCellStyle})
+            columnPropertyList.push({
+                field: props.labelMap[label]['name'],
+                cellStyle: changeCellStyle,
+                valueFormatter: percentageFormatter
+            })
         }
         setColumnDefs(columnPropertyList)
 
         // setting circle color
-        setTimeout(()=> {
+        setTimeout(() => {
             let circleEles = document.querySelectorAll('.ag-header-cell:nth-child(n+3) .ag-header-cell-label span.ag-header-cell-text');
             let counter = 0
             for (const label in props.labelMap) {
-                if(circleEles[counter] && circleEles[counter].style){
+                if (circleEles[counter] && circleEles[counter].style) {
                     circleEles[counter].style.setProperty("--circleColor", props.labelMap[label]['color'])
-                    counter+=1;
+                    counter += 1;
                 }
             }
         }, 5)
@@ -122,6 +130,10 @@ const AgGridTable = (props) => {
             return {color: "red"};
         }
         return null;
+    }
+
+    const percentageFormatter = params => {
+        return `${(params.value * 100).toFixed(2)}%`
     }
     const [columnDefs, setColumnDefs] = useState([]);
 
