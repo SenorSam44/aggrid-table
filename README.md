@@ -1,3 +1,88 @@
+# Usage
+
+AgGridtable component generates a table from the json inputs. There are two inputs: gridData (contains the data in json format) and labelMap (contains the label mapping with colors).
+
+` <AgGridTable gridData={grid_data} labelMap={label_map} />`
+
+### gridData
+This will be a json object in the following structure:
+```
+{
+    'inline/xline/depth': {
+        some_slice_number_in_int: {
+            label_in_int: fraction_for_percentage    
+        }
+    }
+}
+```
+
+Example
+```
+{
+    'inline': {
+        400: {
+            3: 0.35,
+            4:0.0,
+            5: 0.63,
+            255: 0.02
+        },
+        670: {
+            3: 0.35,
+            4:0.0,
+            5: 0.63,
+            255: 0.02
+        }
+    },
+    'xline': {
+        1400: {
+            3: 0.55,
+            4:1.0,
+            5: 0.63,
+            255: 0.42
+        },
+        2670: {
+            3: 0.35,
+            4:0.9,
+            5: 0.83,
+            255: 0.22
+        }
+    },
+}
+```
+
+
+### labelMap
+```
+{
+    label_in_int: {
+        name: label_in_string,
+        color: color_in_rgb_or_hex_code
+    },
+    label_in_int: {
+        name: label_in_string,
+        color: color_in_rgb_or_hex_code
+    },
+}
+```
+
+Example:
+```
+{
+    3: {
+        name: "material 1",
+        color: "gray"
+    },
+    4: {
+        name: "material 2",
+        color: "blue"
+    },
+    5: {
+        name: "water",
+        color: "red"
+    },
+}
+```
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

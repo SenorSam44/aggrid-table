@@ -1,6 +1,6 @@
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, { useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {AgGridColumn, AgGridReact} from 'ag-grid-react';
+import {AgGridReact} from 'ag-grid-react';
 
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
@@ -110,7 +110,7 @@ const AgGridTable = (props) => {
             }
         }, 5)
 
-    }, []);
+    }, [props.gridData, props.labelMap]);
     const [rowData, setRowData] = useState([]);
 
     // setting the cell colors
