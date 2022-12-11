@@ -8,7 +8,7 @@ AgGridtable component generates a table from the json inputs. There are two inpu
 This will be a json object in the following structure:
 ```
 {
-    'inline/xline/depth': {
+    'inlines/crosslines/depths': {
         some_slice_number_in_int: {
             label_in_int: fraction_for_percentage    
         }
@@ -19,7 +19,7 @@ This will be a json object in the following structure:
 Example
 ```
 {
-    'inline': {
+    'inlines': {
         400: {
             3: 0.35,
             4:0.0,
@@ -33,7 +33,7 @@ Example
             255: 0.02
         }
     },
-    'xline': {
+    'crosslines': {
         1400: {
             3: 0.55,
             4:1.0,

@@ -7,7 +7,7 @@ function App() {
     <div className="App">
         <AgGridTable
             gridData = {{
-                'inline': {
+                'inlines': {
                     400: {
                         3: 0.35,
                         4:0.0,
@@ -21,7 +21,7 @@ function App() {
                         255: 0.02
                     }
                 },
-                'xline': {
+                'crosslines': {
                     1400: {
                         3: 0.55,
                         4:1.0,

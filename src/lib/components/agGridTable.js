@@ -70,7 +70,7 @@ const AgGridTable = (props) => {
         let rowDataList = []
         for (const axis in props.gridData) {
             for (const sliceNumber in props.gridData[axis]) {
-                let rowDataCell = {slice: `${axis} ${sliceNumber}`}
+                let rowDataCell = {slice: `${axis==="crosslines"? "Xline": axis.charAt(0).toUpperCase() + axis.slice(1, -1)} ${sliceNumber}`}
                 let total_labeled = 0.00
                 for (const value in props.gridData[axis][sliceNumber]) {
                     if (props.labelMap[value] && props.labelMap[value]['name']) {
