@@ -104,7 +104,6 @@ const AgGridTable = (props) => {
             if(fieldList.includes(props.labelMap[label]['name'])){
                 columnPropertyList.push({
                     field: props.labelMap[label]['name'],
-                    headerComponent: 'AgCustomHeader',
                     headerComponentParams: {
                         color: props.labelMap[label]['color'],
                     },
