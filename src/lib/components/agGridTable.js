@@ -11,22 +11,21 @@ const useStyles = makeStyles({
         borderTop: "1px solid #e2e2e2",
         "&.ag-theme-material .ag-header": {
             backgroundColor: '#8D8D8D',
-            height: "30px!important",
+            height: "100%!important",
             minHeight: "30px!important",
         },
         "&.ag-theme-material .ag-header .ag-header-container": {
-            height: "30px",
+            height: "100%",
 
         },
         "&.ag-theme-material .ag-header .ag-header-row": {
-            height: "30px!important",
+            height: "100%!important",
         },
         "&.ag-theme-material .ag-header-container .ag-header-cell, &.ag-theme-material .ag-cell": {
             borderRight: "2px solid black",
         },
         "&.ag-theme-material .ag-header-cell": {
             justifyContent: "center",
-            fontSize: "20px",
             textAlign: "center"
         },
         "&.ag-theme-material .ag-header-cell-comp-wrapper": {
@@ -57,6 +56,7 @@ const useStyles = makeStyles({
     },
     customHeaderLabel: {
         fontSize: "18px",
+        whiteSpace: "pre-wrap"
 
     },
     headerCircle: {
