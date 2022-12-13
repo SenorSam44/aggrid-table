@@ -11,12 +11,7 @@ const useStyles = makeStyles({
         borderTop: "1px solid #e2e2e2",
         "&.ag-theme-material .ag-header": {
             backgroundColor: '#8D8D8D',
-            height: "100%!important",
-            minHeight: "30px!important",
-        },
-        "&.ag-theme-material .ag-header .ag-header-container": {
-            height: "100%",
-
+            minHeight: "50px!important",
         },
         "&.ag-theme-material .ag-header .ag-header-row": {
             height: "100%!important",
