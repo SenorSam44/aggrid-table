@@ -1,7 +1,6 @@
 import React, { useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {AgGridReact} from 'ag-grid-react';
-import AgCustomHeader from "./agCustomHeader"
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 
@@ -55,6 +54,18 @@ const useStyles = makeStyles({
             top: "19px",
             height: "16px"
         },
+    },
+    customHeaderLabel: {
+        fontSize: "18px",
+
+    },
+    headerCircle: {
+        content: "''",
+        marginRight: "5px",
+        width: "14px",
+        height: "14px",
+        borderRadius: "10px",
+        display: "inline-block",
     }
 });
 
@@ -88,7 +99,7 @@ const AgGridTable = (props) => {
             cellStyle: totalChangeCellStyle,
             valueFormatter: percentageFormatter
         }]
-        console.log(fieldList)
+
         for (const label in props.labelMap) {
             if(fieldList.includes(props.labelMap[label]['name'])){
                 columnPropertyList.push({
@@ -130,6 +141,18 @@ const AgGridTable = (props) => {
         return `${((params.value? params.value: 0) * 100).toFixed(2)}%`
     }
     const [columnDefs, setColumnDefs] = useState([]);
+
+    const AgCustomHeader = (props) => {
+        const classes = useStyles()
+        return (
+            <div className={classes.customHeaderLabel}>
+                {
+                    props.color? <span className={classes.headerCircle} style={{background: "#" + props.color}}/> : null
+                }
+                {props.displayName}
+            </div>
+        );
+    };
 
     return (
         <div className={[classes.gridContainer, "ag-theme-material"].join(" ")}
