@@ -1,7 +1,7 @@
 import React, { useEffect, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {AgGridReact} from 'ag-grid-react';
-
+import AgCustomHeader from "./agCustomHeader"
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 
@@ -22,12 +22,16 @@ const useStyles = makeStyles({
         "&.ag-theme-material .ag-header .ag-header-row": {
             height: "30px!important",
         },
-        "&.ag-theme-material .ag-header-container .ag-header-cell:not(:last-child), &.ag-theme-material .ag-cell:not(:last-child)": {
+        "&.ag-theme-material .ag-header-container .ag-header-cell, &.ag-theme-material .ag-cell": {
             borderRight: "2px solid black",
         },
-        "&.ag-theme-material .ag-header-cell .ag-cell-label-container": {
+        "&.ag-theme-material .ag-header-cell": {
             justifyContent: "center",
             fontSize: "20px",
+            textAlign: "center"
+        },
+        "&.ag-theme-material .ag-header-cell-comp-wrapper": {
+            justifyContent: "center"
         },
         "&.ag-theme-material .ag-header-cell .ag-header-cell-label": {
             flex: "unset",
@@ -51,15 +55,6 @@ const useStyles = makeStyles({
             top: "19px",
             height: "16px"
         },
-        "&.ag-theme-material .ag-header-cell:nth-child(n+3) .ag-header-cell-label span.ag-header-cell-text:before": {
-            content: "''",
-            marginRight: "5px",
-            background: "var(--circleColor, green)",
-            width: "14px",
-            height: "14px",
-            borderRadius: "10px",
-            display: "inline-block",
-        },
     }
 });
 
@@ -68,12 +63,16 @@ const AgGridTable = (props) => {
     useEffect(() => {
         // setting row data
         let rowDataList = []
+        let fieldList = []
         for (const axis in props.gridData) {
             for (const sliceNumber in props.gridData[axis]) {
                 let rowDataCell = {slice: `${axis==="crosslines"? "Xline": axis.charAt(0).toUpperCase() + axis.slice(1, -1)} ${sliceNumber}`}
                 let total_labeled = 0.00
                 for (const value in props.gridData[axis][sliceNumber]) {
                     if (props.labelMap[value] && props.labelMap[value]['name']) {
+                        if(!fieldList.includes(props.labelMap[value]['name'])){
+                            fieldList.push(props.labelMap[value]['name'])
+                        }
                         rowDataCell[props.labelMap[value]['name']] = props.gridData[axis][sliceNumber][value]
                         total_labeled += props.gridData[axis][sliceNumber][value]
                     }
@@ -89,28 +88,23 @@ const AgGridTable = (props) => {
             cellStyle: totalChangeCellStyle,
             valueFormatter: percentageFormatter
         }]
+        console.log(fieldList)
         for (const label in props.labelMap) {
-            columnPropertyList.push({
-                field: props.labelMap[label]['name'],
-                cellStyle: changeCellStyle,
-                valueFormatter: percentageFormatter
-            })
+            if(fieldList.includes(props.labelMap[label]['name'])){
+                columnPropertyList.push({
+                    field: props.labelMap[label]['name'],
+                    headerComponent: 'AgCustomHeader',
+                    headerComponentParams: {
+                        color: props.labelMap[label]['color'],
+                    },
+                    cellStyle: changeCellStyle,
+                    valueFormatter: percentageFormatter
+                })
+            }
         }
         setColumnDefs(columnPropertyList)
-
-        // setting circle color
-        setTimeout(() => {
-            let circleEles = document.querySelectorAll('.ag-header-cell:nth-child(n+3) .ag-header-cell-label span.ag-header-cell-text');
-            let counter = 0
-            for (const label in props.labelMap) {
-                if (circleEles[counter] && circleEles[counter].style) {
-                    circleEles[counter].style.setProperty("--circleColor", props.labelMap[label]['color'])
-                    counter += 1;
-                }
-            }
-        }, 5)
-
     }, [props.gridData, props.labelMap]);
+
     const [rowData, setRowData] = useState([]);
 
     // setting the cell colors
@@ -133,14 +127,15 @@ const AgGridTable = (props) => {
     }
 
     const percentageFormatter = params => {
-        return `${(params.value * 100).toFixed(2)}%`
+        return `${((params.value? params.value: 0) * 100).toFixed(2)}%`
     }
     const [columnDefs, setColumnDefs] = useState([]);
 
     return (
         <div className={[classes.gridContainer, "ag-theme-material"].join(" ")}
-             style={{height: '45vh', background: "white"}}>
+             style={{height: '35vh', background: "white"}}>
             <AgGridReact
+                frameworkComponents={{ agColumnHeader: AgCustomHeader }}
                 rowData={rowData}
                 columnDefs={columnDefs}>
             </AgGridReact>
