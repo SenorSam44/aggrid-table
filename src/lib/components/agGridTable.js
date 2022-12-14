@@ -1,4 +1,4 @@
-import React, { useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {AgGridReact} from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -51,7 +51,7 @@ const useStyles = makeStyles({
     },
     customHeaderLabel: {
         fontSize: "18px",
-        whiteSpace: "pre-wrap"
+        whiteSpace: "pre-wrap",
 
     },
     headerCircle: {
@@ -66,6 +66,13 @@ const useStyles = makeStyles({
 
 const AgGridTable = (props) => {
     const classes = useStyles();
+    const gridRef = useRef();
+    const defaultColDef = useMemo(() => {
+        return {
+            resizable: true,
+        };
+    }, []);
+
     useEffect(() => {
         // setting row data
         let rowDataList = []
@@ -108,7 +115,14 @@ const AgGridTable = (props) => {
             }
         }
         setColumnDefs(columnPropertyList)
+
     }, [props.gridData, props.labelMap]);
+
+    useEffect(()=> {
+        setTimeout(()=> {
+            autoSizeAll(false)
+        }, 400)
+    })
 
     const [rowData, setRowData] = useState([]);
 
@@ -147,11 +161,21 @@ const AgGridTable = (props) => {
             </div>
         );
     };
+    const autoSizeAll = useCallback((skipHeader) => {
+        const allColumnIds = [];
+        gridRef.current.columnApi.getColumns().forEach((column) => {
+            allColumnIds.push(column.getId());
+        });
+        gridRef.current.columnApi.autoSizeColumns(allColumnIds, skipHeader);
+    }, []);
+
 
     return (
         <div className={[classes.gridContainer, "ag-theme-material"].join(" ")}
              style={{height: '35vh', background: "white"}}>
             <AgGridReact
+                ref={gridRef}
+                defaultColDef={defaultColDef}
                 frameworkComponents={{ agColumnHeader: AgCustomHeader }}
                 rowData={rowData}
                 columnDefs={columnDefs}>
