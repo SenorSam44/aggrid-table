@@ -72,61 +72,81 @@ const AgGridTable = (props) => {
             resizable: true,
         };
     }, []);
+    const [rowData, setRowData] = useState([]);
+    const [columnDefs, setColumnDefs] = useState([]);
+    const [fieldList, setFieldList] = useState([]);
 
     useEffect(() => {
         // setting row data
+        processingRowData()
+
+        // setting column data
+        const column_property_list = processColumnLabelList(props.labelMap)
+        setColumnDefs(column_property_list)
+    }, [props.gridData, props.labelMap]);
+
+    // converts input into field list and row data
+    const processingRowData = () => {
         let rowDataList = []
-        let fieldList = []
+        let field_list = []
         for (const axis in props.gridData) {
             for (const sliceNumber in props.gridData[axis]) {
-                let rowDataCell = {slice: `${axis==="crosslines"? "Xline": axis.charAt(0).toUpperCase() + axis.slice(1, -1)} ${sliceNumber}`}
-                let total_labeled = 0.00
-                for (const value in props.gridData[axis][sliceNumber]) {
-                    if (props.labelMap[value] && props.labelMap[value]['name']) {
-                        if(!fieldList.includes(props.labelMap[value]['name'])){
-                            fieldList.push(props.labelMap[value]['name'])
-                        }
-                        rowDataCell[props.labelMap[value]['name']] = props.gridData[axis][sliceNumber][value]
-                        total_labeled += props.gridData[axis][sliceNumber][value]
-                    }
-                }
+                let [field_list, total_labeled, rowDataCell] = prepareRowDataWithLabel(axis, sliceNumber, props.gridData[axis][sliceNumber], props.labelMap)
+
+                field_list = [...field_list, ...fieldList]
                 rowDataCell["total labeled"] = total_labeled
                 rowDataList.push(rowDataCell)
             }
         }
+        setFieldList([...new Set(field_list)])
         setRowData(rowDataList)
-        // setting column data
-        let columnPropertyList = [{field: 'slice'}, {
+    }
+
+    const prepareRowDataWithLabel = (axis, sliceNumber, sliceData, labelMap) => {
+        let row_data_cell = {slice: `${axis === "crosslines" ? "Xline" : axis.charAt(0).toUpperCase() + axis.slice(1, -1)} ${sliceNumber}`} // changes 'inlines' -> 'Inline', 'crosslines' -> 'Xline'
+        let total_labeled = 0.00
+        let field_names = []
+        for (const value in sliceData) {
+            if (labelMap[value] && labelMap[value]['name']) {
+                field_names.push(labelMap[value]['name'])
+                row_data_cell[labelMap[value]['name']] = sliceData[value]
+                total_labeled += sliceData[value]
+            }
+        }
+        return [field_names, total_labeled, row_data_cell]
+    }
+    const processColumnLabelList = (labelMap) => {
+        let column_property_list = [{field: 'slice'}, {
             field: 'total labeled',
             cellStyle: totalChangeCellStyle,
             valueFormatter: percentageFormatter
         }]
 
-        for (const label in props.labelMap) {
-            if(fieldList.includes(props.labelMap[label]['name'])){
-                columnPropertyList.push({
-                    field: props.labelMap[label]['name'],
+        for (const label in labelMap) {
+            if (fieldList.includes(labelMap[label]['name'])) {
+                // include field name and color in the column property
+                column_property_list.push({
+                    field: labelMap[label]['name'],
                     headerComponentParams: {
-                        color: props.labelMap[label]['color'],
+                        color: labelMap[label]['color'],
                     },
                     cellStyle: changeCellStyle,
                     valueFormatter: percentageFormatter
                 })
             }
         }
-        setColumnDefs(columnPropertyList)
 
-    }, [props.gridData, props.labelMap]);
+        return column_property_list
+    }
 
-    useEffect(()=> {
-        setTimeout(()=> {
-            autoSizeAll(false)
+    useEffect(() => {
+        // resizing the columns according to the label width
+        setTimeout(() => {
+            autoSizeAll()
         }, 400)
     })
 
-    const [rowData, setRowData] = useState([]);
-
-    // setting the cell colors
+    // setting the cell colors for total label column
     const totalChangeCellStyle = params => {
         if (params.value < 0.5) {
             return {color: "red"};
@@ -138,6 +158,7 @@ const AgGridTable = (props) => {
         return null;
     }
 
+    // setting the cell colors for cells
     const changeCellStyle = params => {
         if (params.value > 0.5) {
             return {color: "red"};
@@ -146,27 +167,30 @@ const AgGridTable = (props) => {
     }
 
     const percentageFormatter = params => {
-        return `${((params.value? params.value: 0) * 100).toFixed(2)}%`
+        return `${((params.value ? params.value : 0) * 100).toFixed(2)}%`
     }
-    const [columnDefs, setColumnDefs] = useState([]);
 
+    // custom header; a circle and the label
     const AgCustomHeader = (props) => {
         const classes = useStyles()
         return (
             <div className={classes.customHeaderLabel}>
                 {
-                    props.color? <span className={classes.headerCircle} style={{background: "#" + props.color}}/> : null
+                    props.color ?
+                        <span className={classes.headerCircle} style={{background: "#" + props.color}}/> : null
                 }
                 {props.displayName}
             </div>
         );
     };
-    const autoSizeAll = useCallback((skipHeader) => {
+
+    // auto resizing the columns
+    const autoSizeAll = useCallback(() => {
         const allColumnIds = [];
         gridRef.current.columnApi.getColumns().forEach((column) => {
             allColumnIds.push(column.getId());
         });
-        gridRef.current.columnApi.autoSizeColumns(allColumnIds, skipHeader);
+        gridRef.current.columnApi.autoSizeColumns(allColumnIds);
     }, []);
 
 
@@ -176,7 +200,7 @@ const AgGridTable = (props) => {
             <AgGridReact
                 ref={gridRef}
                 defaultColDef={defaultColDef}
-                frameworkComponents={{ agColumnHeader: AgCustomHeader }}
+                frameworkComponents={{agColumnHeader: AgCustomHeader}}
                 rowData={rowData}
                 columnDefs={columnDefs}>
             </AgGridReact>
